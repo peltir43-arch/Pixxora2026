@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PIXORA — Social Universe</title>
+<style>
+:root{--bg:#f5f5fa;--card:#fff;--text:#171721;--muted:#858595;--purple:#7655ef;--pink:#ed4da5;--line:#ececf2;--soft:#f0edff;--input:#fafafd;--danger:#e5484d;
+padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14141c;--card:#1d1d28;--text:#f0f0f6;--muted:#9a9aaf;--line:#2c2c3a;--soft:#2a2547;--input:#232331;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14141c;--card:#1d1d28;--text:#f0f0f6;--muted:#9a9aaf;--line:#2c2c3a;--soft:#2a2547;--input:#232331;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}
+button,input,textarea{font:inherit;color:inherit}button{cursor:pointer}
+.hidden{display:none!important}.muted{color:var(--muted)}
+.app{display:grid;grid-template-columns:235px minmax(350px,1fr) 290px;max-width:1450px;margin:auto;min-height:100vh;gap:22px;padding:20px}
+.sidebar,.rightbar{position:sticky;top:20px;height:calc(100vh - 40px)}
+.sidebar{background:var(--card);border-radius:22px;padding:25px 17px;display:flex;flex-direction:column}
+.logo,.auth h1{font-weight:900;background:linear-gradient(120deg,var(--purple),var(--pink));color:transparent;background-clip:text;-webkit-background-clip:text}
+.logo{font-size:29px;letter-spacing:-1.5px;margin:5px 10px 35px}
+.nav{display:flex;align-items:center;gap:14px;padding:14px 13px;border-radius:13px;border:0;background:transparent;text-align:left;font-size:15px;color:var(--muted);margin-bottom:5px;width:100%}
+.nav.active,.nav:hover{background:var(--soft);color:var(--purple);font-weight:700}
+.nav span{font-size:20px;width:25px}.nav i{font-style:normal}
+.nav.create{color:var(--purple);font-weight:700}
+.nav.create span{width:38px;height:30px;border-radius:10px;background:linear-gradient(110deg,var(--purple),var(--pink));color:#fff;display:grid;place-items:center;font-size:22px;font-weight:700;line-height:1}
+.morewrap{position:relative}
+#moreMenu{position:absolute;bottom:calc(100% + 8px);left:0;min-width:220px;z-index:30;padding:8px;margin:0;box-shadow:0 10px 40px #0003}
+.main{min-width:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.topbar h2{margin:0;font-size:23px}
+.avatar{width:39px;height:39px;flex:none;border-radius:50%;background:linear-gradient(135deg,#b9a6ff,#ffb0d7);display:grid;place-items:center;font-weight:800;color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;margin-bottom:17px}
+.announce{background:linear-gradient(110deg,var(--purple),var(--pink));color:#fff;border-radius:14px;padding:13px 17px;margin-bottom:17px;font-size:14px}
+.stories{display:flex;gap:17px;overflow:auto;padding:15px 5px}
+.story{text-align:center;min-width:65px;font-size:12px;color:var(--muted)}
+.ring{width:59px;height:59px;border-radius:50%;padding:3px;background:linear-gradient(45deg,#ffb52e,#ed329b,#7655ef);margin:0 auto 6px}
+.ring div{width:100%;height:100%;border-radius:50%;border:3px solid var(--card);background:var(--soft);display:grid;place-items:center;font-weight:800;color:var(--purple)}
+.post-head{display:flex;align-items:center;gap:10px;margin-bottom:13px}.post-head .info{flex:1}
+.post-image{width:100%;max-height:480px;object-fit:cover;border-radius:13px;background:#8884}
+.post-actions{display:flex;gap:19px;padding:13px 0 5px}
+.action{border:0;background:none;font-size:21px;padding:0}.action.liked{color:#ed438f}
+.caption{font-size:14px;line-height:1.6;margin-bottom:8px}
+.comment-list{border-top:1px solid var(--line);margin-top:12px;padding-top:9px}
+.comment{font-size:13px;margin:8px 0}
+.comment-form,.row{display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap}
+input,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;outline:none;background:var(--input)}
+.primary{border:0;border-radius:11px;padding:11px 17px;color:#fff;background:linear-gradient(110deg,var(--purple),var(--pink));font-weight:700}
+.secondary{border:1px solid var(--line);background:var(--card);padding:10px 15px;border-radius:11px}
+.danger{border:0;border-radius:9px;padding:8px 12px;background:var(--danger);color:#fff;font-weight:700}
+.rightbar{display:flex;flex-direction:column;gap:16px}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.statbox{background:var(--card);border:1px solid var(--line);padding:15px;border-radius:15px}
+.statbox strong{display:block;font-size:21px;margin-top:7px}.statbox small{color:var(--muted)}
+.cover{height:150px;border-radius:15px;background:linear-gradient(120deg,#7655ef,#ec75ba) center/cover}
+.profile-info{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:-38px;padding:0 13px;position:relative}
+.profile-info .avatar{width:75px;height:75px;border:4px solid var(--card);font-size:28px}
+.profile-name{font-size:21px;font-weight:800;line-height:1.5;word-break:break-word}
+.reel{height:620px;max-width:390px;margin:auto;border-radius:18px;position:relative;overflow:hidden;color:#fff;background:linear-gradient(150deg,#252047,#9d6caa,#efaa8a);display:grid;place-items:center}
+.admin-table{width:100%;border-collapse:collapse;font-size:13px}
+.admin-table td,.admin-table th{padding:12px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.admin-table input{width:70px;padding:6px;border-radius:7px}
+.tag{background:var(--danger);color:#fff;border-radius:6px;padding:2px 7px;font-size:11px;margin-left:5px}
+.holo{background:linear-gradient(100deg,#00e5ff,#a06bff,#ff5fd2,#ffe66d,#00e5ff);background-size:250% 100%;color:transparent;background-clip:text;-webkit-background-clip:text;animation:holo 3s linear infinite;font-weight:800;filter:drop-shadow(0 0 6px #a06bff66)}
+@keyframes holo{to{background-position:250% 0}}
+.exb{font-size:10px;font-weight:800;margin-left:6px;padding:2px 7px;border-radius:6px;color:#3a2a00;background:linear-gradient(110deg,#ffd76a,#fff3b8,#e6a817);vertical-align:middle}
+.cover{position:relative}
+.cover.exg{background-image:linear-gradient(120deg,#ffd76a,#ff8fd0,#8fd3ff,#a06bff,#ffd76a);background-size:300% 300%;animation:shine 6s ease infinite}
+@keyframes shine{50%{background-position:100% 50%}}
+.cover.ex::after{content:"★ EXCLUSIVE";position:absolute;right:12px;top:12px;font-size:11px;font-weight:800;padding:5px 10px;border-radius:8px;color:#3a2a00;background:linear-gradient(110deg,#ffd76a,#fff3b8,#e6a817)}
+.auth-wrap{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(130deg,#eeeaff,#fff0f7)}
+.auth{background:var(--card);width:min(420px,100%);padding:30px;border-radius:23px;box-shadow:0 15px 60px #40306b18}
+.auth h1{text-align:center;font-size:38px;margin:0 0 8px}
+.auth input{margin:8px 0}.auth button{width:100%;margin-top:10px}
+.notice{font-size:12px;color:var(--muted);line-height:1.5}
+@media(max-width:1050px){.app{grid-template-columns:190px 1fr}.rightbar{display:none}}
+@media(max-width:700px){
+.app{display:block;padding:12px}
+.sidebar{position:fixed;z-index:5;top:auto;bottom:0;left:0;right:0;height:65px;border-radius:18px 18px 0 0;padding:5px 8px;flex-direction:row;justify-content:space-around}
+.logo,.sidebar>div[style]{display:none}.nav{flex-direction:column;gap:2px;flex:1;min-width:0;justify-content:center;align-items:center;text-align:center;font-size:10px;white-space:nowrap}.nav span{font-size:20px;width:auto;line-height:1}.morewrap{flex:1;display:flex}#moreMenu{left:auto;right:0}#moreMenu .nav{flex-direction:row;justify-content:flex-start;text-align:left;width:100%;padding:12px 13px;font-size:15px;gap:14px;flex:none}#moreMenu .nav span{font-size:20px;width:25px}
+.nav{width:auto;padding:6px 2px;margin:0}.main{padding-bottom:80px}.reel{height:70vh}}
+</style>
+</head>
+<body>
+
+<div id="authScreen" class="auth-wrap">
+  <div class="auth">
+    <h1>PIXORA</h1>
+    <p style="text-align:center" class="muted">Your world. Your moments.</p>
+    <div id="pickerForm" class="hidden">
+      <h3 style="text-align:center;margin:6px 0">Pilih akun</h3>
+      <div id="pickerList"></div>
+      <div id="newAcc" class="hidden" style="margin-top:12px">
+        <b style="font-size:13px">Buat akun baru</b>
+        <input id="newName" placeholder="Nama tampilan">
+        <input id="newUser" placeholder="Username">
+        <button class="primary" onclick="createShared()">Buat &amp; Masuk</button>
+      </div>
+      <button id="addOther" class="secondary hidden" onclick="toggleAuth(false)">+ Masuk dengan akun lain</button>
+    </div>
+    <div id="loginForm">
+      <input id="loginUser" placeholder="Username" autocomplete="username">
+      <input id="loginPass" type="password" placeholder="Password" autocomplete="current-password">
+      <button class="primary" onclick="login()">Masuk ke Pixora</button>
+      <p class="notice">Belum punya akun? <a href="#" onclick="toggleAuth(true);return false">Daftar sekarang</a></p>
+    </div>
+    <div id="registerForm" class="hidden">
+      <input id="regName" placeholder="Nama tampilan">
+      <input id="regUser" placeholder="Username">
+      <input id="regPass" type="password" placeholder="Password">
+      <button class="primary" onclick="register()">Buat akun</button>
+      <p class="notice"><a href="#" onclick="toggleAuth(false);return false">Kembali ke login</a></p>
+    </div>
+    <p class="notice" id="authNote">Demo ini menyimpan data di browser perangkat ini. Jangan gunakan password asli atau data pribadi.</p>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="logo">PIXORA.</div>
+    <button class="nav active" data-page="feed" onclick="go('feed')"><span>⌂</span><i>Home</i></button>
+    
+    <button class="nav" data-page="reels" onclick="go('reels')"><span>▶</span><i>Reels</i></button>
+    <button class="nav create" onclick="openCreate()" title="Buat"><span>＋</span><i>Buat</i></button>
+    <button class="nav" data-page="messages" onclick="dmWith=null;go('messages')"><span>✉</span><i>Pesan</i></button>
+    <button class="nav" data-page="profile" onclick="viewId=null;go('profile')"><span>◉</span><i>My Profile</i></button>
+    
+    <div style="flex:1"></div>
+    <div class="morewrap">
+      <div id="moreMenu" class="card hidden" onclick="closeMore()">
+        <button class="nav" data-page="threads" onclick="go('threads')"><span>◎</span><i>Threads</i></button>
+        <button class="nav" id="adminNav" data-page="admin" onclick="go('admin')"><span>▦</span><i>Admin Panel</i></button>
+        <button class="nav" data-page="settings" onclick="go('settings')"><span>⚙</span><i>Settings</i></button>
+        <button class="nav" onclick="switchAccount()"><span>⇄</span><i>Ganti Akun</i></button>
+        <button class="nav" onclick="logout()"><span>↪</span><i>Logout</i></button>
+      </div>
+      <button class="nav" id="moreBtn" onclick="toggleMore()"><span>☰</span><i>Lainnya</i></button>
+    </div>
+    
+    
+  </aside>
+
+  <main class="main">
+    <div class="topbar"><h2 id="pageTitle">Home Feed</h2><div class="avatar" id="topAvatar">P</div></div>
+    <div id="announceBar" class="announce hidden"></div>
+
+    <section id="feedPage">
+      <div class="card"><b>Stories</b><div class="stories" id="stories"></div></div>
+      <div id="feedPosts"></div>
+    </section>
+
+    <section id="threadsPage" class="hidden">
+      <div class="card">
+        <h3 style="margin-top:0">Buat Thread</h3>
+        <textarea id="threadText" rows="3" placeholder="Tulis sesuatu..."></textarea>
+        <button class="primary" style="margin-top:10px" onclick="createThread()">Post Thread</button>
+      </div>
+      <div id="threadPosts"></div>
+    </section>
+
+    <section id="reelsPage" class="hidden">
+      <div class="reel"><h2>PIXORA REELS</h2></div>
+      <p class="notice">Demo ini belum memiliki rekomendasi video otomatis. Video yang diunggah lewat feed tersimpan sebagai postingan.</p>
+    </section>
+
+    <section id="profilePage" class="hidden">
+      <div class="card">
+        <div class="cover" id="profileCover"></div>
+        <div class="profile-info">
+          <div class="avatar" id="profileAvatar">P</div>
+          <div><div class="profile-name" id="profileName"></div><div class="muted" id="profileHandle"></div></div>
+        </div>
+        <p id="profileBio" style="padding:0 13px"></p>
+        <div class="row hidden" id="otherActions" style="padding:0 13px;margin-bottom:12px"><button id="followBtn" class="primary" onclick="toggleFollow()">Ikuti</button><button class="secondary" onclick="openDM(viewId)">✉ Pesan</button></div>
+        <div class="stat">
+          <div class="statbox"><strong id="myFollowers">0</strong><small>Followers</small></div>
+          <div class="statbox"><strong id="myFollowing">0</strong><small>Following</small></div>
+          <div class="statbox"><strong id="myLikes">0</strong><small>Total Likes</small></div>
+          <div class="statbox"><strong id="myPosts">0</strong><small>Posts</small></div>
+        </div>
+        <div class="row">
+          <button class="secondary" onclick="editBio()">Edit Bio</button>
+          <label class="secondary">📷 Ganti Foto Profil<input id="avatarInput" type="file" accept="image/*" hidden></label>
+          <label class="secondary">🖼 Ganti Banner<input id="bannerInput" type="file" accept="image/*" hidden></label>
+          <button class="secondary" onclick="removeBanner()">Hapus Banner</button>
+        </div>
+      </div>
+      <h3>Postingan Saya</h3>
+      <div id="myPostsList"></div>
+    </section>
+
+    <section id="messagesPage" class="hidden">
+      <div id="dmList" class="card"></div>
+      <div id="dmThread" class="card hidden">
+        <div class="row" style="margin:0 0 10px"><button class="secondary" onclick="closeDM()">←</button><b id="dmTitle"></b></div>
+        <div id="dmMsgs" style="height:380px;overflow:auto;display:flex;flex-direction:column;gap:6px"></div>
+        <div class="comment-form"><input id="dmInput" placeholder="Tulis pesan..." style="flex:1" onkeydown="if(event.key==='Enter')sendDM()"><button class="primary" onclick="sendDM()">Kirim</button></div>
+      </div>
+    </section>
+
+    <section id="settingsPage" class="hidden">
+      <div class="card">
+        <h3 style="margin-top:0">🎨 Tema</h3>
+        <div class="row">
+          <button id="th-auto" onclick="setTheme('auto')">Otomatis</button>
+          <button id="th-light" onclick="setTheme('light')">Terang</button>
+          <button id="th-dark" onclick="setTheme('dark')">Gelap</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">👤 Akun</h3>
+        <input id="setName" placeholder="Nama tampilan" style="margin-bottom:8px">
+        <input id="setPass" type="password" placeholder="Password baru (kosongkan jika tidak diganti)" autocomplete="new-password">
+        <div class="row"><button class="primary" onclick="saveAccount()">Simpan Akun</button></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">🔒 Privasi</h3>
+        <label class="row" style="margin:0 0 8px"><input type="checkbox" id="setPriv" style="width:auto" onchange="savePriv()"> Akun privat (hanya pengikut yang bisa melihat postingan & story)</label>
+        <label class="row" style="margin:0"><input type="checkbox" id="setHide" style="width:auto" onchange="saveHide()"> Sembunyikan jumlah like di postingan saya</label>
+        <div id="reqList"></div>
+      </div>
+    </section>
+
+    <section id="adminPage" class="hidden">
+      <div class="card">
+        <h2 style="margin-top:0">Admin Dashboard</h2>
+        <div class="stat">
+          <div class="statbox"><small>Total Users</small><strong id="totalUsers">0</strong></div>
+          <div class="statbox"><small>Total Posts</small><strong id="totalPosts">0</strong></div>
+          <div class="statbox"><small>Total Likes</small><strong id="totalLikes">0</strong></div>
+          <div class="statbox"><small>Verified / Banned</small><strong id="totalVerified">0</strong></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">Banner Pengumuman</h3>
+        <textarea id="announceText" rows="2" placeholder="Tulis pengumuman untuk semua pengguna..."></textarea>
+        <div class="row">
+          <label><input type="checkbox" id="announceOn" style="width:auto"> Tampilkan</label>
+          <button class="primary" onclick="saveAnnounce()">Simpan Banner</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">Manajemen Pengguna</h3>
+        <div style="overflow:auto"><table class="admin-table">
+          <thead><tr><th>User</th><th>Followers</th><th>Following</th><th>Likes</th><th>Tambah</th><th>Centang Biru</th><th>Banner Exclusive</th><th>Nama Hologram</th><th>Simpan</th><th>Ban</th></tr></thead>
+          <tbody id="userTable"></tbody>
+        </table></div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="rightbar">
+    <div class="card"><h3 style="margin-top:0">Overview</h3>
+      <div class="stat">
+        <div class="statbox">👥<strong id="sideUsers">0</strong><small>Users</small></div>
+        <div class="statbox">📝<strong id="sidePosts">0</strong><small>Posts</small></div>
+      </div>
+    </div>
+    <div class="card"><h3 style="margin-top:0">Trending Tags</h3>
+      <p>#pixora <span class="muted">· Community</span></p>
+      <p>#dailyvibes <span class="muted">· Lifestyle</span></p>
+      <p>#creativity <span class="muted">· Art</span></p>
+    </div>
+  </aside>
+</div>
+
+<div id="createModal" class="hidden" style="position:fixed;inset:0;z-index:60;background:#000a;display:grid;place-items:center;padding:14px" onclick="closeCreate()">
+  <div class="card" style="width:min(460px,100%);max-height:92vh;overflow:auto;margin:0" onclick="event.stopPropagation()">
+    <div id="crChoose">
+      <h3 style="margin-top:0">Buat</h3>
+      <div class="row"><button class="primary" style="flex:1" onclick="startCreate('post')">📝 Postingan</button><button class="primary" style="flex:1" onclick="startCreate('story')">⭕ Story</button></div>
+    </div>
+    <div id="crForm" class="hidden">
+      <div class="row" style="margin:0 0 10px"><button class="secondary" onclick="chooseCreate()">←</button><h3 id="crTitle" style="margin:0"></h3></div>
+      <textarea id="crText" rows="3"></textarea>
+      <div id="camPanel" class="hidden" style="margin-bottom:10px">
+        <video id="camVid" autoplay playsinline muted style="width:100%;max-height:360px;border-radius:13px;background:#000;object-fit:cover"></video>
+        <div class="row" style="justify-content:center"><button class="secondary" onclick="flipCam()">🔄 Balik</button><button class="primary" onclick="snapCam()">● Ambil Foto</button><button class="secondary" onclick="closeCam()">✕</button></div>
+      </div>
+      <div class="row"><label class="secondary">🖼 Galeri<input id="crFile" type="file" accept="image/*,video/*" hidden></label><button class="secondary" onclick="openCamera()">📸 Kamera</button><input id="camInput" type="file" accept="image/*" capture="user" hidden><span class="muted" id="crName">Belum ada media</span></div>
+      <div id="crPrevWrap" class="hidden" style="margin-top:10px">
+        <canvas id="crCan" style="max-width:100%;max-height:320px;border-radius:13px;display:block;margin:auto;touch-action:none"></canvas>
+        <video id="crVid" class="post-image hidden" style="max-height:260px" controls muted playsinline></video>
+        <p id="crFilterNote" class="notice" style="margin:8px 0 0"></p>
+        <div id="crFilters" class="row" style="margin-top:6px"></div>
+        <div id="faceBox" class="hidden">
+          <p class="notice" style="margin:10px 0 0">Filter wajah:</p>
+          <div class="row" style="margin-top:6px"><button id="ff-none" class="primary" onclick="pickFace(null)">Tanpa</button><button id="ff-mask" class="secondary" onclick="pickFace('mask')">🎭 Mask Snap</button></div>
+          <div id="faceCtl" class="hidden"><p id="faceNote" class="notice"></p>
+            <label class="notice">Ukuran<input id="maskSize" type="range" min="15" max="120" value="55" oninput="maskAdjust()" style="padding:0;border:0;background:none"></label>
+            <label class="notice">Miring<input id="maskRot" type="range" min="-45" max="45" value="0" oninput="maskAdjust()" style="padding:0;border:0;background:none"></label></div>
+        </div>
+      </div>
+      <div class="row"><button class="primary" onclick="submitCreate()">Bagikan</button><button class="secondary" onclick="closeCreate()">Batal</button></div>
+    </div>
+  </div>
+</div>
+<div id="storyView" class="hidden" style="position:fixed;inset:0;z-index:50;background:#000d;display:grid;place-items:center" onclick="nextStory()">
+  <div style="position:relative;width:min(380px,100%);height:min(680px,100vh);background:#000;border-radius:16px;overflow:hidden;color:#fff">
+    <div style="position:absolute;top:8px;left:8px;right:8px;height:3px;background:#fff4;border-radius:3px;z-index:2"><div id="svFill" style="height:100%;width:0;background:#fff;border-radius:3px"></div></div>
+    <div id="svHead" style="position:absolute;top:16px;left:12px;right:12px;z-index:2;display:flex;justify-content:space-between;align-items:center;font-size:14px;text-shadow:0 1px 6px #000"></div>
+    <img id="svImg" alt="Story" style="width:100%;height:100%;object-fit:cover">
+    <video id="svVid" class="hidden" muted playsinline loop style="width:100%;height:100%;object-fit:cover"></video>
+    <div id="svText" style="position:absolute;bottom:24px;left:16px;right:16px;font-size:18px;font-weight:700;text-shadow:0 2px 8px #000"></div>
+  </div>
+</div>
+<script>
+// Ganti kredensial owner demo di sini.
+const OWNER_USERNAME="pixoraofficial", OWNER_PASSWORD="pixora2026";
+const K={users:"pixora_users",posts:"pixora_posts",settings:"pixora_settings"};
+const $=id=>document.getElementById(id);
+
+function load(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch(e){return fallback}}
+let users=load(K.users,[]), posts=load(K.posts,[]), settings=load(K.settings,{announce:"",announceOn:false});
+let me=null, media=null, viewId=null, dmWith=null;
+let msgs=load("pixora_msgs",[]), stories=load("pixora_stories",[]), svList=[], svI=0, svTimer=null;
+
+// ---------- Tema & Settings ----------
+function getTheme(){try{return localStorage.getItem("pixora_theme")||"auto"}catch(e){return "auto"}}
+function applyTheme(t){const r=document.documentElement;t==="auto"?r.removeAttribute("data-theme"):r.setAttribute("data-theme",t)}
+function setTheme(t){try{localStorage.setItem("pixora_theme",t)}catch(e){}applyTheme(t);renderSettings()}
+function renderSettings(){
+  const t=getTheme();
+  ["auto","light","dark"].forEach(k=>$("th-"+k).className=k===t?"primary":"secondary");
+  $("setName").value=me.name;$("setPass").value="";$("setHide").checked=!!me.hideLikes;$("setPriv").checked=!!me.private;renderReqs();
+}
+function saveAccount(){
+  const n=$("setName").value.trim(), p=$("setPass").value;
+  if(!n)return alert("Nama tidak boleh kosong.");
+  if(p&&me.owner)return alert("Password owner diatur di kode (OWNER_PASSWORD).");
+  if(p&&p.length<4)return alert("Password minimal 4 karakter.");
+  me.name=n.slice(0,30);if(p)me.password=p;
+  save();paintMe();refresh();renderSettings();alert("Akun diperbarui.");
+}
+function saveHide(){me.hideLikes=$("setHide").checked;save();refresh()}
+applyTheme(getTheme());
+
+function save(){
+  if(SHARED)return syncOut();
+  try{
+    localStorage.setItem(K.users,JSON.stringify(users));
+    localStorage.setItem(K.posts,JSON.stringify(posts));
+    localStorage.setItem(K.settings,JSON.stringify(settings));
+    localStorage.setItem("pixora_msgs",JSON.stringify(msgs));
+    localStorage.setItem("pixora_stories",JSON.stringify(stories));
+  }catch(e){alert("Penyimpanan penuh. Hapus beberapa postingan bermedia.")}
+}
+const safe=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+const initial=u=>safe((u.name||"P")[0].toUpperCase());
+const avStyle=u=>u.avatar?`style="background:url(${u.avatar}) center/cover"`:"";
+const avatar=u=>`<div class="avatar" ${avStyle(u)}>${u.avatar?"":initial(u)}</div>`;
+function paintAv(id,u){const e=$(id);e.style.background=u.avatar?`url(${u.avatar}) center/cover`:"";e.textContent=u.avatar?"":(u.name||"P")[0].toUpperCase()}
+function paintMe(){paintAv("topAvatar",me)}
+const userById=id=>users.find(u=>u.id===id)||{name:"Pengguna",username:"unknown"};
+const check=u=>u.verified?' <span title="Terverifikasi" style="display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;background:#1d9bf0;color:#fff;font-size:11px;vertical-align:middle">✓</span>':"";
+const nameHTML=u=>(u.holo?`<span class="holo">${safe(u.name)}</span>`:safe(u.name))+check(u)+(u.exclusive?'<span class="exb">★ EXCLUSIVE</span>':"");
+
+// ---------- Auth ----------
+function toggleAuth(reg){
+  $("pickerForm").classList.add("hidden");
+  $("loginForm").classList.toggle("hidden",reg);
+  $("registerForm").classList.toggle("hidden",!reg);
+}
+function register(){
+  const name=$("regName").value.trim(), username=$("regUser").value.trim().toLowerCase(), password=$("regPass").value;
+  if(!name||!username||!password)return alert("Lengkapi semua data.");
+  if(!/^[a-z0-9_]{3,20}$/.test(username))return alert("Username 3-20 karakter: huruf, angka, underscore.");
+  if(username===OWNER_USERNAME||users.some(u=>u.username===username))return alert("Username sudah dipakai.");
+  users.push({id:crypto.randomUUID(),name,username,password,bio:"Welcome to my Pixora ✨",banner:null,
+    followers:0,following:0,likes:0,verified:false,owner:false,banned:false,banReason:""});
+  save();alert("Akun berhasil dibuat! Silakan login.");toggleAuth(false);
+}
+function login(){
+  const username=$("loginUser").value.trim().toLowerCase(), password=$("loginPass").value;
+  let u=null;
+  if(username===OWNER_USERNAME&&password===OWNER_PASSWORD){
+    u=users.find(x=>x.owner);
+    if(u){u.username=OWNER_USERNAME;u.password=OWNER_PASSWORD;if(u.name==="Pixora Owner")u.name="Pixora Official"}
+    if(!u){
+      u={id:crypto.randomUUID(),name:"Pixora Official",username:OWNER_USERNAME,password:OWNER_PASSWORD,
+        bio:"Official Pixora account ✨",banner:null,followers:125000,following:120,likes:48000,
+        verified:true,holo:true,exclusive:true,owner:true,banned:false,banReason:""};
+      users.push(u);
+    }
+  }else u=users.find(x=>x.username===username&&x.password===password&&!x.owner);
+  if(!u)return alert("Username atau password salah.");
+  if(u.banned)return alert("Akun ini dibanned."+(u.banReason?"\nAlasan: "+u.banReason:""));
+  me=u;remember(u.id);save();startApp();
+}
+function startApp(){
+  $("authScreen").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("adminNav").classList.toggle("hidden",!me.owner);
+  paintMe();
+  renderAll();go("feed");
+}
+function logout(){
+  me=null;viewId=null;dmWith=null;
+  $("app").classList.add("hidden");$("authScreen").classList.remove("hidden");
+  if(SHARED)renderPicker();else toggleAuth(false);
+}
+
+// ---------- Navigasi ----------
+const TITLES={feed:"Home Feed",threads:"Threads",reels:"Pixora Reels",profile:"My Profile",settings:"Settings",messages:"Pesan",admin:"Admin Dashboard"};
+function toggleMore(){$("moreMenu").classList.toggle("hidden")}
+function closeMore(){$("moreMenu").classList.add("hidden")}
+document.addEventListener("click",e=>{if(!e.target.closest(".morewrap"))closeMore()});
+function go(page){
+  if(page==="admin"&&!me.owner)return alert("Khusus owner.");
+  Object.keys(TITLES).forEach(p=>$(p+"Page").classList.toggle("hidden",p!==page));
+  document.querySelectorAll(".nav[data-page]").forEach(n=>n.classList.toggle("active",n.dataset.page===page));
+  $("pageTitle").textContent=TITLES[page];
+  $("moreBtn").classList.toggle("active",["threads","admin","settings"].includes(page));closeMore();
+  if(page==="profile")renderProfile();
+  if(page==="admin")renderAdmin();
+  if(page==="settings")renderSettings();
+  if(page==="messages")renderDM();
+}
+
+// ---------- Media ----------
+function readFile(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(file)})}
+// Perkecil gambar agar muat di localStorage
+function shrinkImage(file,maxW,quality){
+  return new Promise(async res=>{
+    const img=new Image();
+    img.onload=()=>{
+      const s=Math.min(1,maxW/img.width), c=document.createElement("canvas");
+      c.width=img.width*s;c.height=img.height*s;
+      c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      res(c.toDataURL("image/jpeg",quality));
+    };
+    img.src=await readFile(file);
+  });
+}
+async function loadPicked(f,input){
+  if(!f)return;
+  if(f.type.startsWith("video/")){
+    if(SHARED){input.value="";return alert("Video belum didukung di mode server (batas 256 KB per data). Gunakan foto.")}
+    if(f.size>2*1024*1024){input.value="";return alert("Video dibatasi 2 MB pada demo.")}
+    media={data:await readFile(f),type:f.type};
+  }else media={data:await shrinkImage(f,SHARED?700:(crMode==="story"?720:1000),SHARED?.6:.75),type:"image/jpeg"};
+  $("crName").textContent=f.name||"Foto kamera";showCrPrev();
+}
+$("crFile").addEventListener("change",e=>loadPicked(e.target.files[0],e.target));
+$("camInput").addEventListener("change",e=>loadPicked(e.target.files[0],e.target));
+$("bannerInput").addEventListener("change",async e=>{
+  const f=e.target.files[0];if(!f)return;
+  me.banner=await shrinkImage(f,900,.6);
+  save();renderProfile();e.target.value="";
+});
+function removeBanner(){me.banner=null;save();renderProfile()}
+$("avatarInput").addEventListener("change",async e=>{
+  const f=e.target.files[0];if(!f)return;
+  me.avatar=await shrinkImage(f,256,.85);
+  save();paintMe();refresh();e.target.value="";
+});
+
+// ---------- Posting ----------
+function addPost(text,kind,m){
+  posts.unshift({id:crypto.randomUUID(),userId:me.id,text,media:m||null,kind,likes:[],comments:[],date:Date.now()});
+  save();renderAll();
+}
+function createThread(){
+  const text=$("threadText").value.trim();
+  if(!text)return alert("Tulis thread terlebih dahulu.");
+  addPost(text,"thread");$("threadText").value="";
+}
+function mediaHTML(m){
+  if(!m)return "";
+  return m.type.startsWith("video/")?`<video class="post-image" controls playsinline src="${m.data}" style="filter:${FILTERS[m.filter]||"none"}"></video>`:`<img class="post-image" src="${m.data}" alt="Media" style="filter:${FILTERS[m.filter]||"none"}">`;
+}
+function postHTML(p){
+  const u=userById(p.userId), liked=p.likes.includes(me.id);
+  return `<article class="card" id="post-${p.id}">
+    <div class="post-head">${avatar(u)}
+      <div class="info" style="cursor:pointer" onclick="openProfile('${u.id}')"><b>${nameHTML(u)}</b><br><small class="muted">@${safe(u.username)} · ${new Date(p.date).toLocaleString("id-ID")}</small></div>
+      ${p.userId===me.id||me.owner?`<button class="secondary" onclick="deletePost('${p.id}')">Hapus</button>`:""}
+    </div>
+    ${p.text?`<div class="caption">${safe(p.text).replace(/\n/g,"<br>")}</div>`:""}
+    ${mediaHTML(p.media)}
+    <div class="post-actions">
+      <button class="action ${liked?"liked":""}" onclick="toggleLike('${p.id}')">${liked?"♥":"♡"}</button>
+      <button class="action" onclick="$('comment-${p.id}').focus()">▢</button>
+      <button class="action" onclick="sharePost('${p.id}')">↗</button>
+    </div>
+    <b style="font-size:13px">${u.hideLikes&&u.id!==me.id?"Jumlah like disembunyikan":p.likes.length+" likes"}</b>
+    <div class="comment-list">${p.comments.map(c=>`<div class="comment"><b>${safe(userById(c.userId).username)}</b> ${safe(c.text)}</div>`).join("")}</div>
+    <div class="comment-form">
+      <input id="comment-${p.id}" placeholder="Tulis komentar..." style="flex:1">
+      <button class="primary" onclick="addComment('${p.id}')">Kirim</button>
+    </div>
+  </article>`;
+}
+// Postingan dari user yang dibanned disembunyikan
+const visible=kind=>!me?[]:posts.filter(p=>(!kind||p.kind===kind)&&!userById(p.userId).banned&&!isLocked(userById(p.userId)));
+function renderAll(){
+  const f=visible("feed"), t=visible("thread");
+  $("feedPosts").innerHTML=f.map(postHTML).join("")||'<div class="card muted">Belum ada postingan. Jadilah yang pertama!</div>';
+  $("threadPosts").innerHTML=t.map(postHTML).join("")||'<div class="card muted">Belum ada thread.</div>';
+  $("stories").innerHTML=addStoryBtn()+storyUsers().map(u=>
+    `<div class="story" style="cursor:pointer" onclick="openStory('${u.id}')"><div class="ring"><div ${avStyle(u)}>${u.avatar?"":initial(u)}</div></div>${safe(u.username)}</div>`).join("");
+  $("sideUsers").textContent=users.filter(u=>!u.banned).length;
+  $("sidePosts").textContent=visible().length;
+  const bar=$("announceBar");
+  bar.textContent="📢 "+settings.announce;
+  bar.classList.toggle("hidden",!(settings.announceOn&&settings.announce));
+}
+function refresh(){renderAll();if(!$("profilePage").classList.contains("hidden"))renderProfile()}
+function toggleLike(id){
+  const p=posts.find(x=>x.id===id);if(!p)return;
+  const i=p.likes.indexOf(me.id);i>=0?p.likes.splice(i,1):p.likes.push(me.id);
+  save();refresh();
+}
+function addComment(id){
+  const p=posts.find(x=>x.id===id), v=$("comment-"+id).value.trim();
+  if(!p||!v)return;
+  p.comments.push({userId:me.id,text:v});save();refresh();
+}
+function deletePost(id){
+  if(!confirm("Hapus postingan ini?"))return;
+  posts=posts.filter(p=>p.id!==id);save();refresh();
+}
+function sharePost(id){
+  const url=location.href.split("#")[0]+"#post-"+id;
+  if(navigator.share)navigator.share({title:"Pixora",url}).catch(()=>{});
+  else if(navigator.clipboard)navigator.clipboard.writeText(url).then(()=>alert("Link disalin."),()=>alert(url));
+  else alert(url);
+}
+
+// ---------- Profil ----------
+function renderProfile(){
+  const u=profUser(), self=u.id===me.id, mine=isLocked(u)?[]:posts.filter(p=>p.userId===u.id), fmt=n=>Number(n).toLocaleString("id-ID");
+  $("profileName").innerHTML=nameHTML(u);
+  $("profileHandle").textContent="@"+u.username;
+  $("profileBio").textContent=u.bio;
+  paintAv("profileAvatar",u);
+  $("profileCover").style.backgroundImage=u.banner?`url(${u.banner})`:"";
+  $("profileCover").className="cover"+(u.exclusive?" ex":"")+(u.exclusive&&!u.banner?" exg":"");
+  $("myFollowers").textContent=fmt(fCount(u));
+  $("myFollowing").textContent=fmt(gCount(u));
+  $("myLikes").textContent=fmt(u.likes+mine.reduce((n,p)=>n+p.likes.length,0));
+  $("myPosts").textContent=mine.length;
+  $("myPostsList").innerHTML=isLocked(u)?'<div class="card muted">🔒 Akun ini privat. Ikuti untuk melihat postingan.</div>':mine.map(postHTML).join("")||'<div class="card muted">Belum ada postingan.</div>';
+  $("avatarInput").closest(".row").classList.toggle("hidden",!self);
+  $("otherActions").classList.toggle("hidden",self);
+  $("pageTitle").textContent=self?"My Profile":"Profil @"+u.username;
+  document.querySelector("#profilePage h3").textContent=self?"Postingan Saya":"Postingan";
+  const fing=isFollowing(me,u), req=(u.requests||[]).includes(me.id);
+  $("followBtn").textContent=fing?"Mengikuti ✓":req?"Diminta":"Ikuti";
+  $("followBtn").className=fing||req?"secondary":"primary";
+}
+function editBio(){
+  const bio=prompt("Tulis bio baru:",me.bio);
+  if(bio===null)return;
+  me.bio=bio.slice(0,160);save();renderProfile();
+}
+
+// ---------- Filter foto ----------
+const FILTERS={normal:"none",hangat:"sepia(.35) saturate(1.4) hue-rotate(-10deg)",dingin:"sepia(.2) hue-rotate(170deg) saturate(1.3)",hitam:"grayscale(1)",vintage:"sepia(.6) contrast(1.1) brightness(.95)",cerah:"brightness(1.15) saturate(1.5) contrast(1.05)",drama:"contrast(1.4) saturate(1.2) brightness(.9)"};
+const sel={cr:null};
+
+// ---------- Follow & akun privat ----------
+const profUser=()=>users.find(x=>x.id===viewId)||me;
+const isFollowing=(a,b)=>(a.follows||[]).includes(b.id);
+const fCount=u=>(u.followers||0)+users.filter(x=>(x.follows||[]).includes(u.id)).length;
+const gCount=u=>(u.following||0)+(u.follows||[]).length;
+const isLocked=u=>!!(me&&u.private&&u.id!==me.id&&!me.owner&&!isFollowing(me,u));
+function openProfile(id){viewId=id===me.id?null:id;go("profile")}
+function toggleFollow(){
+  const u=profUser();if(u.id===me.id)return;
+  me.follows=me.follows||[];
+  if(isFollowing(me,u))me.follows=me.follows.filter(i=>i!==u.id);
+  else if(u.private){
+    u.requests=u.requests||[];
+    u.requests=u.requests.includes(me.id)?u.requests.filter(i=>i!==me.id):[...u.requests,me.id];
+  }else me.follows.push(u.id);
+  save();refresh();
+}
+function savePriv(){me.private=$("setPriv").checked;save();refresh()}
+function renderReqs(){
+  const r=(me.requests||[]).filter(id=>users.some(u=>u.id===id));
+  $("reqList").innerHTML=r.length?"<p><b>Permintaan mengikuti</b></p>"+r.map(id=>{const u=userById(id);
+    return `<div class="row">${avatar(u)}<b style="flex:1">@${safe(u.username)}</b><button class="primary" onclick="answerReq('${id}',true)">Terima</button><button class="secondary" onclick="answerReq('${id}',false)">Tolak</button></div>`}).join(""):"";
+}
+function answerReq(id,ok){
+  me.requests=(me.requests||[]).filter(i=>i!==id);
+  if(ok){const r=users.find(u=>u.id===id);if(r){r.follows=r.follows||[];if(!r.follows.includes(me.id))r.follows.push(me.id)}}
+  save();renderSettings();refresh();
+}
+
+// ---------- Stories ----------
+const DAY=864e5;
+const activeStories=()=>stories.filter(s=>Date.now()-s.date<DAY&&!userById(s.userId).banned&&!isLocked(userById(s.userId)));
+function storyUsers(){
+  if(!me)return [];
+  const ids=[...new Set(activeStories().sort((a,b)=>b.date-a.date).map(s=>s.userId))];
+  ids.sort((a,b)=>(b===me.id)-(a===me.id));
+  return ids.map(userById);
+}
+function addStoryBtn(){
+  if(!me)return "";
+  return `<div class="story" style="cursor:pointer" onclick="openCreate('story')"><div class="ring" style="background:var(--line)"><div style="font-size:26px">+</div></div>Story kamu</div>`;
+}
+// ---------- Buat konten (Postingan / Story, filter wajib) ----------
+let crMode=null;
+function openCreate(mode){
+  if(!me)return;
+  $("createModal").classList.remove("hidden");
+  mode?startCreate(mode):chooseCreate();
+}
+function chooseCreate(){closeCam();crMode=null;media=null;$("crChoose").classList.remove("hidden");$("crForm").classList.add("hidden")}
+function startCreate(mode){
+  closeCam();crMode=mode;media=null;sel.cr=null;
+  $("crChoose").classList.add("hidden");$("crForm").classList.remove("hidden");
+  $("crTitle").textContent=mode==="story"?"Buat Story (24 jam)":"Buat Postingan";
+  $("crText").placeholder=mode==="story"?"Teks story (opsional)":"Apa yang sedang kamu pikirkan?";
+  $("crText").value="";$("crFile").value="";$("crName").textContent="Belum ada media";showCrPrev();
+}
+function closeCreate(){closeCam();$("createModal").classList.add("hidden");media=null;crMode=null;showCrPrev()}
+function showCrPrev(){
+  const ok=!!media, can=$("crCan"), vid=$("crVid"), vd=ok&&media.type.startsWith("video/");
+  $("crPrevWrap").classList.toggle("hidden",!ok);
+  can.classList.toggle("hidden",!ok||vd);vid.classList.toggle("hidden",!vd);
+  $("faceBox").classList.toggle("hidden",!ok||vd);
+  sel.cr=null;sel.face=null;crMasks=[];crImgObj=null;
+  if(!ok){vid.pause();vid.removeAttribute("src");return}
+  can.style.filter=vid.style.filter="none";
+  if(vd)vid.src=media.data;
+  else{const im=new Image();im.onload=()=>{crImgObj=im;can.width=im.naturalWidth;can.height=im.naturalHeight;pickFace(null)};im.src=media.data}
+  $("crFilters").innerHTML=Object.keys(FILTERS).map(n=>`<button type="button" class="secondary" data-f="${n}" onclick="pickFilter('${n}')">${n[0].toUpperCase()+n.slice(1)}</button>`).join("");
+  $("crFilterNote").textContent="Pilih satu filter dulu (wajib).";
+}
+function pickFilter(n){
+  sel.cr=n;$("crCan").style.filter=$("crVid").style.filter=FILTERS[n];
+  $("crFilters").querySelectorAll("button").forEach(b=>b.className=b.dataset.f===n?"primary":"secondary");
+  $("crFilterNote").textContent="Filter: "+n[0].toUpperCase()+n.slice(1);
+}
+function submitCreate(){
+  const text=$("crText").value.trim();
+  if(crMode==="story"&&!media)return alert("Pilih foto atau video untuk story.");
+  if(!text&&!media)return alert("Tulis sesuatu atau pilih media.");
+  if(media&&!sel.cr)return alert("Pilih filter dulu sebelum membagikan.");
+  if(sel.face&&crImgObj&&!media.type.startsWith("video/"))media={data:$("crCan").toDataURL("image/jpeg",SHARED?.6:.85),type:"image/jpeg"};
+  if(crMode==="story")stories.push({id:crypto.randomUUID(),userId:me.id,media:media.data,mtype:media.type,filter:sel.cr,text:text.slice(0,120),date:Date.now()});
+  else posts.unshift({id:crypto.randomUUID(),userId:me.id,text,media:media&&{...media,filter:sel.cr},kind:"feed",likes:[],comments:[],date:Date.now()});
+  save();closeCreate();renderAll();go("feed");
+}
+// ---------- Kamera & filter wajah ----------
+let crImgObj=null, crMasks=[], crActive=0, camStream=null, camFacing="user";
+async function openCamera(){
+  try{
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw new Error("no camera");
+    closeCam();
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:camFacing,width:{ideal:1280}},audio:false});
+    const v=$("camVid");v.srcObject=camStream;v.style.transform=camFacing==="user"?"scaleX(-1)":"none";
+    $("camPanel").classList.remove("hidden");
+  }catch(e){
+    $("crName").textContent="Kamera langsung tidak bisa dibuka ("+(e&&e.name||"error")+"). Memakai kamera bawaan perangkat.";
+    $("camInput").click();   // cadangan: kamera bawaan perangkat
+  }
+}
+function flipCam(){camFacing=camFacing==="user"?"environment":"user";openCamera()}
+function closeCam(){
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null}
+  $("camVid").srcObject=null;$("camPanel").classList.add("hidden");
+}
+function snapCam(){
+  const v=$("camVid");if(!v.videoWidth)return;
+  const max=SHARED?700:(crMode==="story"?720:1000), k=Math.min(1,max/v.videoWidth);
+  const c=document.createElement("canvas");c.width=Math.round(v.videoWidth*k);c.height=Math.round(v.videoHeight*k);
+  const x=c.getContext("2d");
+  if(camFacing==="user"){x.translate(c.width,0);x.scale(-1,1)}
+  x.drawImage(v,0,0,c.width,c.height);
+  media={data:c.toDataURL("image/jpeg",SHARED?.6:.8),type:"image/jpeg"};
+  closeCam();$("crName").textContent="Foto kamera";showCrPrev();
+}
+function drawMask(x,cx,cy,w,rot){
+  x.save();x.translate(cx,cy);x.rotate(rot);x.scale(w/200,w/200);
+  const g=x.createLinearGradient(-100,-30,100,30);g.addColorStop(0,"#7655ef");g.addColorStop(.5,"#ed4da5");g.addColorStop(1,"#ffb347");
+  x.beginPath();
+  x.moveTo(-100,-6);
+  x.bezierCurveTo(-96,-44,-48,-54,-12,-30);x.quadraticCurveTo(0,-22,12,-30);
+  x.bezierCurveTo(48,-54,96,-44,100,-6);
+  x.bezierCurveTo(96,30,52,42,22,22);x.quadraticCurveTo(0,12,-22,22);
+  x.bezierCurveTo(-52,42,-96,30,-100,-6);
+  x.closePath();
+  x.moveTo(-26,0);x.ellipse(-48,0,22,13,0,0,Math.PI*2);
+  x.moveTo(70,0);x.ellipse(48,0,22,13,0,0,Math.PI*2);
+  x.fillStyle=g;x.globalAlpha=.95;x.fill("evenodd");x.globalAlpha=1;
+  x.lineWidth=3;x.strokeStyle="#fff";x.stroke();
+  x.fillStyle="#fff";
+  [[-82,-18,3],[-70,12,2.5],[-20,-8,2],[0,-30,4],[20,-8,2],[72,14,2.5],[84,-18,3],[-60,-30,2],[60,-30,2]].forEach(([a,b,r])=>{x.beginPath();x.arc(a,b,r,0,7);x.fill()});
+  x.beginPath();x.moveTo(0,-46);x.lineTo(8,-36);x.lineTo(0,-26);x.lineTo(-8,-36);x.closePath();x.fill();
+  x.restore();
+}
+function redrawCr(){
+  const can=$("crCan");if(!crImgObj)return;
+  const x=can.getContext("2d");x.clearRect(0,0,can.width,can.height);x.drawImage(crImgObj,0,0);
+  if(sel.face==="mask")crMasks.forEach(m=>drawMask(x,m.x,m.y,m.w,m.r));
+}
+function pickFace(k){
+  sel.face=k;
+  $("ff-none").className=k?"secondary":"primary";$("ff-mask").className=k==="mask"?"primary":"secondary";
+  $("faceCtl").classList.toggle("hidden",k!=="mask");
+  if(k==="mask")autoMasks();else{crMasks=[];redrawCr()}
+}
+async function autoMasks(){
+  const W=$("crCan").width,H=$("crCan").height;crMasks=[];crActive=0;let auto=false;
+  try{
+    if("FaceDetector" in window&&crImgObj){
+      const faces=await new FaceDetector({fastMode:true,maxDetectedFaces:5}).detect(crImgObj);
+      const ctr=l=>{const p=l.locations;return {x:p.reduce((a,q)=>a+q.x,0)/p.length,y:p.reduce((a,q)=>a+q.y,0)/p.length}};
+      faces.forEach(f=>{
+        const eyes=(f.landmarks||[]).filter(l=>l.type==="eye").map(ctr).sort((a,b)=>a.x-b.x);
+        if(eyes.length>=2){const a=eyes[0],b=eyes[1],d=Math.hypot(b.x-a.x,b.y-a.y);crMasks.push({x:(a.x+b.x)/2,y:(a.y+b.y)/2,w:d*2.2,r:Math.atan2(b.y-a.y,b.x-a.x)})}
+        else{const bb=f.boundingBox;crMasks.push({x:bb.x+bb.width/2,y:bb.y+bb.height*.4,w:bb.width*1.1,r:0})}
+      });
+      auto=crMasks.length>0;
+    }
+  }catch(e){}
+  if(sel.face!=="mask")return;
+  if(!crMasks.length)crMasks=[{x:W/2,y:H*.4,w:W*.55,r:0}];
+  $("faceNote").textContent=auto?"Wajah terdeteksi otomatis. Geser topeng untuk menyesuaikan.":"Deteksi wajah otomatis tidak tersedia di browser ini. Geser topeng ke matamu, lalu atur ukuran dan kemiringan.";
+  syncSliders();redrawCr();
+}
+function syncSliders(){
+  const m=crMasks[crActive],W=$("crCan").width;if(!m)return;
+  $("maskSize").value=Math.max(15,Math.min(120,Math.round(m.w/W*100)));
+  $("maskRot").value=Math.max(-45,Math.min(45,Math.round(m.r*180/Math.PI)));
+}
+function maskAdjust(){
+  const m=crMasks[crActive];if(!m)return;
+  m.w=$("crCan").width*$("maskSize").value/100;m.r=$("maskRot").value*Math.PI/180;redrawCr();
+}
+(()=>{
+  const c=$("crCan");let drag=-1;
+  const pos=e=>{const r=c.getBoundingClientRect();return {x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}};
+  c.addEventListener("pointerdown",e=>{
+    if(sel.face!=="mask"||!crMasks.length)return;
+    const p=pos(e);let b=0,bd=1e9;
+    crMasks.forEach((m,i)=>{const d=Math.hypot(m.x-p.x,m.y-p.y);if(d<bd){bd=d;b=i}});
+    drag=b;crActive=b;syncSliders();c.setPointerCapture(e.pointerId);e.preventDefault();
+  });
+  c.addEventListener("pointermove",e=>{if(drag<0)return;const p=pos(e);crMasks[drag].x=p.x;crMasks[drag].y=p.y;redrawCr()});
+  ["pointerup","pointercancel"].forEach(t=>c.addEventListener(t,()=>{drag=-1}));
+})();
+
+function openStory(id){
+  svList=activeStories().filter(s=>s.userId===id).sort((a,b)=>a.date-b.date);
+  if(!svList.length)return;
+  svI=0;$("storyView").classList.remove("hidden");showStory();
+}
+function showStory(){
+  clearTimeout(svTimer);
+  const s=svList[svI],u=userById(s.userId),f=$("svFill");
+  const vd=(s.mtype||"").startsWith("video/"), fl=FILTERS[s.filter]||"none", vv=$("svVid"), im=$("svImg");
+  im.classList.toggle("hidden",vd);vv.classList.toggle("hidden",!vd);
+  im.style.filter=vv.style.filter=fl;
+  if(vd){vv.src=s.media;vv.play().catch(()=>{})}else{vv.pause();im.src=s.media}
+  $("svText").textContent=s.text||"";
+  $("svHead").innerHTML=`<span><b>${safe(u.name)}</b> · ${Math.max(1,Math.round((Date.now()-s.date)/36e5))} j</span><span>${s.userId===me.id||me.owner?`<button onclick="event.stopPropagation();delStory('${s.id}')" style="background:none;border:0;color:#fff;font-size:18px">🗑</button>`:""}<button onclick="event.stopPropagation();closeStory()" style="background:none;border:0;color:#fff;font-size:20px">✕</button></span>`;
+  f.style.transition="none";f.style.width="0";
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.transition="width 5s linear";f.style.width="100%"}));
+  svTimer=setTimeout(nextStory,5000);
+}
+function nextStory(){if(svI<svList.length-1){svI++;showStory()}else closeStory()}
+function closeStory(){clearTimeout(svTimer);$("svVid").pause();$("storyView").classList.add("hidden")}
+function delStory(id){stories=stories.filter(s=>s.id!==id);save();closeStory();renderAll()}
+
+// ---------- Pesan (DM) ----------
+const thread=id=>msgs.filter(m=>(m.from===me.id&&m.to===id)||(m.from===id&&m.to===me.id));
+function openDM(id){
+  const u=users.find(x=>x.id===id);
+  if(!u||u.banned)return;
+  dmWith=id;go("messages");
+}
+function closeDM(){dmWith=null;renderDM()}
+function renderDM(){
+  $("dmList").classList.toggle("hidden",!!dmWith);
+  $("dmThread").classList.toggle("hidden",!dmWith);
+  if(!dmWith){
+    const last=u=>thread(u.id).slice(-1)[0];
+    const others=users.filter(u=>u.id!==me.id&&!u.banned).sort((a,b)=>((last(b)||{}).date||0)-((last(a)||{}).date||0));
+    $("dmList").innerHTML="<b>Pesan</b>"+(others.map(u=>{
+      const l=last(u),pv=l?safe(((l.from===me.id?"Kamu: ":"")+l.text).slice(0,50)):"Mulai percakapan";
+      return `<div class="row" style="flex-wrap:nowrap;cursor:pointer;padding:10px 0;border-bottom:1px solid var(--line)" onclick="openDM('${u.id}')">${avatar(u)}<div style="min-width:0"><b>${nameHTML(u)}</b><br><small class="muted">${pv}</small></div></div>`;
+    }).join("")||'<p class="muted">Belum ada pengguna lain. Buat akun kedua untuk mencoba DM.</p>');
+    return;
+  }
+  $("dmTitle").innerHTML=nameHTML(userById(dmWith));
+  const box=$("dmMsgs");
+  box.innerHTML=thread(dmWith).map(m=>{
+    const mine=m.from===me.id;
+    return `<div style="align-self:${mine?"flex-end":"flex-start"};max-width:75%;padding:8px 12px;border-radius:14px;font-size:14px;word-break:break-word;${mine?"background:linear-gradient(110deg,var(--purple),var(--pink));color:#fff":"background:var(--soft)"}">${safe(m.text)}</div>`;
+  }).join("")||'<p class="muted">Belum ada pesan. Sapa dulu 👋</p>';
+  box.scrollTop=box.scrollHeight;
+}
+function sendDM(){
+  const t=$("dmInput").value.trim();if(!t||!dmWith)return;
+  msgs.push({id:crypto.randomUUID(),from:me.id,to:dmWith,text:t.slice(0,500),date:Date.now()});
+  $("dmInput").value="";save();renderDM();
+}
+
+// ---------- Mode server (db bersama) & ganti akun ----------
+let SHARED=false, myUid=null, isArtOwner=false, canWrite=true, dbx=null, pending=false, lastSet="";
+const last={users:{},posts:{},stories:{},msgs:{}};
+let wq=Promise.resolve();
+const queue=fn=>{wq=wq.then(fn).catch(e=>console.warn("db:",e&&e.message||e))};
+function remember(id){try{const s=load("pixora_saved",[]);if(!s.includes(id))s.push(id);localStorage.setItem("pixora_saved",JSON.stringify(s))}catch(e){}}
+
+// Kirim hanya dokumen yang berubah ke server
+function syncOut(){
+  if(!canWrite)return;
+  const c={users,posts,stories,msgs};
+  for(const k in c){
+    const cur={};c[k].forEach(o=>{cur[o.id]=JSON.stringify(o)});
+    for(const id in cur)if(last[k][id]!==cur[id]){last[k][id]=cur[id];const d=JSON.parse(cur[id]);queue(()=>dbx.collection(k).doc(id).set(d))}
+    for(const id in last[k])if(!(id in cur)){delete last[k][id];queue(()=>dbx.collection(k).doc(id).delete())}
+  }
+  const s=JSON.stringify(settings);
+  if(s!==lastSet){lastSet=s;const d=JSON.parse(s);queue(()=>dbx.doc("settings/main").set(d))}
+}
+const typing=()=>{const a=document.activeElement;return !!a&&/INPUT|TEXTAREA/.test(a.tagName)&&!!a.closest("#feedPosts,#threadPosts,#myPostsList")};
+function uiRefresh(){
+  if(!me){if(!$("pickerForm").classList.contains("hidden"))renderPicker();return}
+  const f=users.find(u=>u.id===me.id);if(f)me=f;
+  if(me.banned){alert("Akun ini dibanned."+(me.banReason?"\nAlasan: "+me.banReason:""));return logout()}
+  if(typing()){pending=true;return}
+  paintMe();refresh();
+  if(!$("messagesPage").classList.contains("hidden"))renderDM();
+}
+document.addEventListener("focusout",()=>{if(pending){pending=false;setTimeout(()=>{if(me)uiRefresh()},60)}});
+
+function startSync(){
+  return new Promise(res=>{
+    let n=0;const ok=()=>{if(++n===5)res()};setTimeout(res,10000);
+    const clone=d=>JSON.parse(JSON.stringify(d.data()));
+    ["users","posts","stories","msgs"].forEach(k=>{
+      let got=false;
+      dbx.collection(k).onSnapshot(snap=>{
+        const arr=snap.docs.map(d=>({...clone(d),id:d.id}));
+        last[k]={};arr.forEach(o=>{last[k][o.id]=JSON.stringify(o)});
+        if(k==="users")users=arr;
+        else if(k==="posts")posts=arr.sort((a,b)=>b.date-a.date);
+        else if(k==="stories")stories=arr;
+        else msgs=arr.sort((a,b)=>a.date-b.date);
+        if(!got){got=true;ok()}else uiRefresh();
+      },e=>console.warn(e));
+    });
+    let sg=false;
+    dbx.doc("settings/main").onSnapshot(s=>{
+      if(s.exists){settings={announce:"",announceOn:false,...clone(s)};lastSet=JSON.stringify(settings)}
+      if(!sg){sg=true;ok()}else uiRefresh();
+    },e=>console.warn(e));
+  });
+}
+
+// Pemilih akun (juga dipakai untuk Ganti Akun)
+const pRow=(u,fn)=>`<div class="row" style="flex-wrap:nowrap;cursor:pointer;padding:10px 0;border-bottom:1px solid var(--line)" onclick="${fn}">${avatar(u)}<div style="min-width:0"><b>${nameHTML(u)}</b><br><small class="muted">@${safe(u.username)}${u.banned?" · dibanned":""}</small></div></div>`;
+function renderPicker(){
+  ["loginForm","registerForm"].forEach(i=>$(i).classList.add("hidden"));
+  $("pickerForm").classList.remove("hidden");
+  const list=SHARED?users.filter(u=>u.uid===myUid&&!u.owner):load("pixora_saved",[]).map(id=>users.find(u=>u.id===id)).filter(Boolean);
+  let h=list.map(u=>pRow(u,`enterAccount('${u.id}')`)).join("");
+  if(SHARED&&isArtOwner)h+=pRow(users.find(x=>x.owner)||{name:"Pixora Official",username:OWNER_USERNAME,holo:true,exclusive:true,verified:true},"enterOwner()");
+  if(!h)h=SHARED&&!canWrite?'<p class="notice">Aksesmu hanya-baca. Minta pemilik membagikan halaman ini sebagai Kontributor untuk membuat akun.</p>':'<p class="notice">Belum ada akun.</p>';
+  $("pickerList").innerHTML=h;
+  $("newAcc").classList.toggle("hidden",!SHARED||!canWrite);
+  $("addOther").classList.toggle("hidden",SHARED);
+  $("authNote").textContent=SHARED?"Mode server: data disimpan di server bersama dan bisa dilihat semua orang yang punya akses ke halaman ini, termasuk DM. Jangan kirim info sensitif.":"Demo ini menyimpan data di browser perangkat ini. Jangan gunakan password asli atau data pribadi.";
+}
+function enterAccount(id){
+  const u=users.find(x=>x.id===id);if(!u)return;
+  if(u.banned)return alert("Akun ini dibanned."+(u.banReason?"\nAlasan: "+u.banReason:""));
+  me=u;viewId=null;dmWith=null;startApp();
+}
+function enterOwner(){
+  let u=users.find(x=>x.owner);
+  if(!u){
+    u={id:crypto.randomUUID(),uid:myUid,name:"Pixora Official",username:OWNER_USERNAME,password:"",bio:"Official Pixora account ✨",banner:null,followers:125000,following:120,likes:48000,verified:true,holo:true,exclusive:true,owner:true,banned:false,banReason:""};
+    users.push(u);
+  }else u.uid=myUid;
+  save();enterAccount(u.id);
+}
+function createShared(){
+  const name=$("newName").value.trim().slice(0,30), username=$("newUser").value.trim().toLowerCase();
+  if(!name||!username)return alert("Lengkapi nama dan username.");
+  if(!/^[a-z0-9_]{3,20}$/.test(username))return alert("Username 3-20 karakter: huruf, angka, underscore.");
+  if(username===OWNER_USERNAME||users.some(u=>u.username===username))return alert("Username sudah dipakai.");
+  const u={id:crypto.randomUUID(),uid:myUid,name,username,password:"",bio:"Welcome to my Pixora ✨",banner:null,followers:0,following:0,likes:0,verified:false,owner:false,banned:false,banReason:""};
+  users.push(u);save();$("newName").value="";$("newUser").value="";enterAccount(u.id);
+}
+function switchAccount(){
+  me=null;viewId=null;dmWith=null;
+  $("app").classList.add("hidden");$("authScreen").classList.remove("hidden");
+  renderPicker();
+}
+
+// Sambungkan ke server jika halaman ini dibuka lewat claude.ai
+(async()=>{
+  try{
+    const cl=window.claude;if(!cl||!cl.use)return;
+    const [d,u]=await Promise.all([cl.use("db"),cl.use("user")]);
+    if(!d||!u)return;
+    const uid=await u.id();
+    if(!uid||me)return;
+    SHARED=true;dbx=d;myUid=uid;isArtOwner=!!(u.isOwner&&u.isOwner());
+    canWrite=(u.can?await u.can("data.write"):null)!==false;
+    users=[];posts=[];stories=[];msgs=[];settings={announce:"",announceOn:false};lastSet=JSON.stringify(settings);
+    $("authNote").textContent="Menghubungkan ke server…";
+    await startSync();
+    renderPicker();
+  }catch(e){console.warn(e);SHARED=false}
+})();
+
+// ---------- Admin ----------
+function renderAdmin(){
+  if(!me.owner)return;
+  $("totalUsers").textContent=users.length;
+  $("totalPosts").textContent=posts.length;
+  $("totalLikes").textContent=posts.reduce((n,p)=>n+p.likes.length,0);
+  $("totalVerified").textContent=users.filter(u=>u.verified).length+" / "+users.filter(u=>u.banned).length;
+  $("announceText").value=settings.announce;
+  $("announceOn").checked=settings.announceOn;
+  $("userTable").innerHTML=users.map(u=>`<tr>
+    <td><b>${safe(u.username)}</b>${u.owner?" (Owner)":""}${u.banned?'<span class="tag">BANNED</span>':""}</td>
+    <td><input type="number" min="0" id="f-${u.id}" value="${u.followers}"></td>
+    <td><input type="number" min="0" id="g-${u.id}" value="${u.following}"></td>
+    <td><input type="number" min="0" id="l-${u.id}" value="${u.likes}"></td>
+    <td><input type="number" min="1" id="a-${u.id}" value="1000" style="width:90px"><br><button class="secondary" onclick="addStat('${u.id}','followers')">+Followers</button> <button class="secondary" onclick="addStat('${u.id}','following')">+Mengikuti</button> <button class="secondary" onclick="addStat('${u.id}','likes')">+Like</button></td>
+    <td><button class="secondary" onclick="toggleVerify('${u.id}')">${u.verified?"✓ Aktif":"+ Beri"}</button></td>
+    <td><button class="secondary" onclick="toggleFlag('${u.id}','exclusive')">${u.exclusive?"★ Aktif":"+ Beri"}</button></td>
+    <td><button class="secondary" onclick="toggleFlag('${u.id}','holo')">${u.holo?"✦ Aktif":"+ Beri"}</button></td>
+    <td><button class="primary" onclick="saveStats('${u.id}')">Simpan</button></td>
+    <td>${u.owner?"—":u.banned?`<button class="secondary" onclick="unban('${u.id}')">Unban</button>`:`<button class="danger" onclick="ban('${u.id}')">Ban</button>`}</td>
+  </tr>`).join("");
+}
+function toggleVerify(id){const u=users.find(x=>x.id===id);if(!u)return;u.verified=!u.verified;save();renderAdmin();refresh()}
+function toggleFlag(id,flag){const u=users.find(x=>x.id===id);if(!u)return;u[flag]=!u[flag];save();renderAdmin();refresh()}
+function addStat(id,field){
+  const u=users.find(x=>x.id===id);if(!u)return;
+  const n=p=>Math.max(0,Number($(p+"-"+id).value)||0);
+  u.followers=n("f");u.following=n("g");u.likes=n("l");
+  u[field]+=Math.max(1,Number($("a-"+id).value)||1);
+  save();renderAdmin();refresh();
+}
+function saveStats(id){
+  const u=users.find(x=>x.id===id);if(!u)return;
+  const n=p=>Math.max(0,Number($(p+"-"+id).value)||0);
+  u.followers=n("f");u.following=n("g");u.likes=n("l");
+  save();renderAdmin();refresh();alert("Statistik berhasil disimpan.");
+}
+function ban(id){
+  const u=users.find(x=>x.id===id);if(!u||u.owner)return;
+  const reason=prompt("Alasan ban untuk @"+u.username+":","Melanggar aturan komunitas");
+  if(reason===null)return;
+  u.banned=true;u.banReason=reason.trim();save();renderAdmin();refresh();
+}
+function unban(id){
+  const u=users.find(x=>x.id===id);if(!u)return;
+  u.banned=false;u.banReason="";save();renderAdmin();refresh();
+}
+function saveAnnounce(){
+  settings.announce=$("announceText").value.trim();
+  settings.announceOn=$("announceOn").checked;
+  save();renderAll();alert("Banner pengumuman disimpan.");
+}
+
+renderAll();
+</script>
+</body>
+</html>
